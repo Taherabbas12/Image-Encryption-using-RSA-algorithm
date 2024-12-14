@@ -5,8 +5,8 @@ os.environ['TCL_LIBRARY'] = r'C:\Users\ma610\AppData\Local\Programs\Python\Pytho
 os.environ['TK_LIBRARY'] = r'C:\Users\ma610\AppData\Local\Programs\Python\Python313\tcl\tk8.6'
 import os
 from tkinter import Tk, Button, Label, filedialog, Frame
-from PIL import Image, ImageTk
-from  generate_keys import generate_keys, load_keys
+from PIL import Image, ImageTk, ImageFilter
+from generate_keys import generate_keys, load_keys
 from image_encryption import encrypt_image, decrypt_image
 
 
@@ -78,14 +78,23 @@ class ImageEncryptionApp:
             return
 
         try:
+            # Load keys
             private_key, public_key = load_keys()
+
+            # Encrypt the image (placeholder for actual encryption logic)
             self.width, self.height = encrypt_image(self.selected_image_path, public_key)
 
-            # عرض صورة التشفير كصورة فارغة رمزية
-            encrypted_placeholder = Image.new("RGB", (200, 200), color="gray")
-            encrypted_photo = ImageTk.PhotoImage(encrypted_placeholder)
-            self.encrypted_image_canvas.config(image=encrypted_photo)
-            self.encrypted_image_canvas.image = encrypted_photo
+            # Apply blur effect to the original image
+            original_image = Image.open(self.selected_image_path)
+            blurred_image = original_image.filter(ImageFilter.GaussianBlur(30))  # Adjust the blur radius as needed
+
+            # Resize the blurred image to fit the canvas
+            blurred_image.thumbnail((200, 200))
+            blurred_photo = ImageTk.PhotoImage(blurred_image)
+
+            # Display the blurred image as the "encrypted" image
+            self.encrypted_image_canvas.config(image=blurred_photo)
+            self.encrypted_image_canvas.image = blurred_photo
 
             self.status_label.config(text="Image encrypted successfully.")
             self.decrypt_button.config(state="normal")
