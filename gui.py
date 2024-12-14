@@ -5,9 +5,25 @@ os.environ['TCL_LIBRARY'] = r'C:\Users\ma610\AppData\Local\Programs\Python\Pytho
 os.environ['TK_LIBRARY'] = r'C:\Users\ma610\AppData\Local\Programs\Python\Python313\tcl\tk8.6'
 import os
 from tkinter import Tk, Button, Label, filedialog, Frame
-from PIL import Image, ImageTk, ImageFilter
+from PIL import Image, ImageTk
+import numpy as np
 from generate_keys import generate_keys, load_keys
 from image_encryption import encrypt_image, decrypt_image
+
+
+def apply_heavy_noise(image):
+    """
+    Apply a heavy noise effect to the image to completely obscure it.
+    """
+    # Get image dimensions
+    width, height = image.size
+
+    # Generate random noise
+    noise = np.random.randint(0, 256, (height, width, 3), dtype='uint8')
+
+    # Convert noise array to a PIL Image
+    noisy_image = Image.fromarray(noise)
+    return noisy_image
 
 
 class ImageEncryptionApp:
@@ -84,17 +100,17 @@ class ImageEncryptionApp:
             # Encrypt the image (placeholder for actual encryption logic)
             self.width, self.height = encrypt_image(self.selected_image_path, public_key)
 
-            # Apply blur effect to the original image
+            # Apply heavy noise effect to the original image
             original_image = Image.open(self.selected_image_path)
-            blurred_image = original_image.filter(ImageFilter.GaussianBlur(30))  # Adjust the blur radius as needed
+            noisy_image = apply_heavy_noise(original_image)
 
-            # Resize the blurred image to fit the canvas
-            blurred_image.thumbnail((200, 200))
-            blurred_photo = ImageTk.PhotoImage(blurred_image)
+            # Resize the noisy image to fit the canvas
+            noisy_image.thumbnail((200, 200))
+            noisy_photo = ImageTk.PhotoImage(noisy_image)
 
-            # Display the blurred image as the "encrypted" image
-            self.encrypted_image_canvas.config(image=blurred_photo)
-            self.encrypted_image_canvas.image = blurred_photo
+            # Display the noisy image as the "encrypted" image
+            self.encrypted_image_canvas.config(image=noisy_photo)
+            self.encrypted_image_canvas.image = noisy_photo
 
             self.status_label.config(text="Image encrypted successfully.")
             self.decrypt_button.config(state="normal")
